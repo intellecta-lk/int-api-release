@@ -9,6 +9,8 @@ on:
 
 env:
   BASE_REPO: intellecta-lk/intellecta
+  # Use docker.io for Docker Hub if empty
+  REGISTRY: ghcr.io
   # PRIVATE_TOKEN :- A PAT Token must be added to the action's secrets for this workflow to work !!!
 
 jobs:

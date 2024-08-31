@@ -1,0 +1,40 @@
+name: Release IntApi
+
+on: 
+  workflow_dispatch:
+    inputs:
+      version:
+        required: true
+        type: string
+
+env:
+  BASE_REPO: intellecta-lk/intellecta
+  # PRIVATE_TOKEN :- A PAT Token must be added to the action's secrets for this workflow to work !!!
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.BASE_REPO }}
+          token: ${{secrets.PRIVATE_TOKEN}}
+      -
+        name: Login to Github Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Container Image Name [Lowercase Repo Name]
+        run: echo "IMAGE_NAME=${GITHUB_REPOSITORY@L}" >> "${GITHUB_ENV}"  
+      -
+        name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ env.IMAGE_NAME }}:latest
+            ghcr.io/${{ env.IMAGE_NAME }}:${{ inputs.version }}
